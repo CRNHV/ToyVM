@@ -52,7 +52,8 @@ namespace Parser
 	uint32_t Parser::ParseFile(const char* file_path, uint32_t* program)
 	{
 		FILE* file = fopen(file_path, "r");
-		if (file == NULL) {
+		if (file == NULL)
+		{
 			perror("Error opening file");
 			return 0;
 		}
@@ -81,330 +82,214 @@ namespace Parser
 		return programSize;
 	}
 
-	uint32_t Parser::HandleLoad()
-	{
-		char* registerToken = strtok(NULL, split);
 
-		if (registerToken[0] != '$')
+	int Parser::ExtractRegister()
+	{
+		char* token = strtok(NULL, split);
+		if (token == NULL || token[0] != '$')
 		{
-			printf("Unknown register value: %s", registerToken);
+			printf("Unknown register value: %s\n", token);
 			return -1;
 		}
-		char* valueToken = strtok(NULL, split);
+		return atoi(token + 1);
+	}
 
-		int registerNumber = atoi(registerToken + 1);
+	uint32_t Parser::EncodeInstruction(uint8_t opcode, int reg1, int reg2, int reg3, uint16_t value)
+	{
+		uint32_t instruction = 0;
+		instruction = BitManipulation::WriteFirst8(instruction, opcode);
+		if (reg1 != -1) instruction = BitManipulation::WriteSecond8(instruction, reg1);
+		if (reg2 != -1) instruction = BitManipulation::WriteThird8(instruction, reg2);
+		if (reg3 != -1) instruction = BitManipulation::WriteLast8(instruction, reg3);
+		if (value != 0) instruction = BitManipulation::WriteLast16(instruction, value);
+		return instruction;
+	}
+
+	// Refactored methods (example for HandleLoad, HandleAdd, and HandleJmp)
+	uint32_t Parser::HandleLoad()
+	{
+		int registerNumber = ExtractRegister();
+		if (registerNumber == -1) return -1;
+
+		char* valueToken = strtok(NULL, split);
 		int valueNumber = atoi(valueToken);
 
-		uint32_t instruction = 0;
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::LOAD);
-		instruction = BitManipulation::WriteSecond8(instruction, registerNumber);
-		instruction = BitManipulation::WriteLast16(instruction, valueNumber);
-		return instruction;
+		return EncodeInstruction(Opcodes::LOAD, registerNumber, -1, -1, valueNumber);
 	}
 
 	uint32_t Parser::HandleAdd()
 	{
-		char* register1Token = strtok(NULL, split);
-		char* register2Token = strtok(NULL, split);
-		char* register3Token = strtok(NULL, split);
+		int register1 = ExtractRegister();
+		if (register1 == -1) return -1;
 
-		if (register1Token[0] != '$' || register2Token[0] != '$' || register3Token[0] != '$')
-		{
-			printf("Unknown register value: %s %s %s", register1Token, register2Token, register3Token);
-			return -1;
-		}
+		int register2 = ExtractRegister();
+		if (register2 == -1) return -1;
 
-		uint32_t instruction = 0;
-		int register1 = atoi(register1Token + 1);
-		int register2 = atoi(register2Token + 1);
-		int register3 = atoi(register3Token + 1);
+		int register3 = ExtractRegister();
+		if (register3 == -1) return -1;
 
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::ADD);
-		instruction = BitManipulation::WriteSecond8(instruction, register1);
-		instruction = BitManipulation::WriteThird8(instruction, register2);
-		instruction = BitManipulation::WriteLast8(instruction, register3);
-		return instruction;
-	}
-
-	uint32_t Parser::HandleDiv()
-	{
-		char* register1Token = strtok(NULL, split);
-		char* register2Token = strtok(NULL, split);
-		char* register3Token = strtok(NULL, split);
-
-		if (register1Token[0] != '$' || register2Token[0] != '$' || register3Token[0] != '$')
-		{
-			printf("Unknown register value: %s %s %s", register1Token, register2Token, register3Token);
-			return -1;
-		}
-
-		uint32_t instruction = 0;
-		int register1 = atoi(register1Token + 1);
-		int register2 = atoi(register2Token + 1);
-		int register3 = atoi(register3Token + 1);
-
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::DIV);
-		instruction = BitManipulation::WriteSecond8(instruction, register1);
-		instruction = BitManipulation::WriteThird8(instruction, register2);
-		instruction = BitManipulation::WriteLast8(instruction, register3);
-		return instruction;
-	}
-
-	uint32_t Parser::HandleSub()
-	{
-		char* register1Token = strtok(NULL, split);
-		char* register2Token = strtok(NULL, split);
-		char* register3Token = strtok(NULL, split);
-
-		if (register1Token[0] != '$' || register2Token[0] != '$' || register3Token[0] != '$')
-		{
-			printf("Unknown register value: %s %s %s", register1Token, register2Token, register3Token);
-			return -1;
-		}
-
-		uint32_t instruction = 0;
-		int register1 = atoi(register1Token + 1);
-		int register2 = atoi(register2Token + 1);
-		int register3 = atoi(register3Token + 1);
-
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::SUB);
-		instruction = BitManipulation::WriteSecond8(instruction, register1);
-		instruction = BitManipulation::WriteThird8(instruction, register2);
-		instruction = BitManipulation::WriteLast8(instruction, register3);
-		return instruction;
-	}
-
-	uint32_t Parser::HandleMul()
-	{
-		char* register1Token = strtok(NULL, split);
-		char* register2Token = strtok(NULL, split);
-		char* register3Token = strtok(NULL, split);
-
-		if (register1Token[0] != '$' || register2Token[0] != '$' || register3Token[0] != '$')
-		{
-			printf("Unknown register value: %s %s %s", register1Token, register2Token, register3Token);
-			return -1;
-		}
-
-		uint32_t instruction = 0;
-		int register1 = atoi(register1Token + 1);
-		int register2 = atoi(register2Token + 1);
-		int register3 = atoi(register3Token + 1);
-
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::MUL);
-		instruction = BitManipulation::WriteSecond8(instruction, register1);
-		instruction = BitManipulation::WriteThird8(instruction, register2);
-		instruction = BitManipulation::WriteLast8(instruction, register3);
-		return instruction;
+		return EncodeInstruction(Opcodes::ADD, register1, register2, register3, 0);
 	}
 
 	uint32_t Parser::HandleJmp()
 	{
 		char* jmpTargetToken = strtok(NULL, split);
-
-		uint32_t instruction = 0;
 		uint16_t jmpTarget = atoi(jmpTargetToken);
 
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::JMP);
-		instruction = BitManipulation::WriteLast16(instruction, jmpTarget);
-		return instruction;
+		return EncodeInstruction(Opcodes::JMP, -1, -1, -1, jmpTarget);
+	}
+
+	uint32_t Parser::HandleDiv()
+	{
+		int register1 = ExtractRegister();
+		if (register1 == -1) return -1;
+
+		int register2 = ExtractRegister();
+		if (register2 == -1) return -1;
+
+		int register3 = ExtractRegister();
+		if (register3 == -1) return -1;
+
+		return EncodeInstruction(Opcodes::DIV, register1, register2, register3, 0);
+	}
+
+	uint32_t Parser::HandleSub()
+	{
+		int register1 = ExtractRegister();
+		if (register1 == -1) return -1;
+
+		int register2 = ExtractRegister();
+		if (register2 == -1) return -1;
+
+		int register3 = ExtractRegister();
+		if (register3 == -1) return -1;
+
+		return EncodeInstruction(Opcodes::SUB, register1, register2, register3, 0);
+	}
+
+	uint32_t Parser::HandleMul()
+	{
+		int register1 = ExtractRegister();
+		if (register1 == -1) return -1;
+
+		int register2 = ExtractRegister();
+		if (register2 == -1) return -1;
+
+		int register3 = ExtractRegister();
+		if (register3 == -1) return -1;
+
+		return EncodeInstruction(Opcodes::MUL, register1, register2, register3, 0);
 	}
 
 	uint32_t Parser::HandleJmpf()
 	{
 		char* jmpTargetToken = strtok(NULL, split);
-
-		uint32_t instruction = 0;
 		uint16_t jmpTarget = atoi(jmpTargetToken);
 
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::JMPF);
-		instruction = BitManipulation::WriteLast16(instruction, jmpTarget);
-		return instruction;
+		return EncodeInstruction(Opcodes::JMPF, -1, -1, -1, jmpTarget);
 	}
+
 	uint32_t Parser::HandleJmpb()
 	{
 		char* jmpTargetToken = strtok(NULL, split);
-
-		uint32_t instruction = 0;
 		uint16_t jmpTarget = atoi(jmpTargetToken);
 
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::JMPB);
-		instruction = BitManipulation::WriteLast16(instruction, jmpTarget);
-		return instruction;
+		return EncodeInstruction(Opcodes::JMPB, -1, -1, -1, jmpTarget);
 	}
 
 	uint32_t Parser::HandleEq()
 	{
-		char* register1Token = strtok(NULL, split);
-		char* register2Token = strtok(NULL, split);
-		if (register1Token[0] != '$' || register2Token[0] != '$')
-		{
-			printf("Unknown register value: %s %s", register1Token, register2Token);
-			return -1;
-		}
+		int register1 = ExtractRegister();
+		if (register1 == -1) return -1;
 
-		uint32_t instruction = 0;
-		int register1 = atoi(register1Token + 1);
-		int register2 = atoi(register2Token + 1);
+		int register2 = ExtractRegister();
+		if (register2 == -1) return -1;
 
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::EQ);
-		instruction = BitManipulation::WriteSecond8(instruction, register1);
-		instruction = BitManipulation::WriteThird8(instruction, register2);
-		return instruction;
+		return EncodeInstruction(Opcodes::EQ, register1, register2, -1, 0);
 	}
 
 	uint32_t Parser::HandleNeq()
 	{
-		char* register1Token = strtok(NULL, split);
-		char* register2Token = strtok(NULL, split);
+		int register1 = ExtractRegister();
+		if (register1 == -1) return -1;
 
-		if (register1Token[0] != '$' || register2Token[0] != '$')
-		{
-			printf("Unknown register value: %s %s", register1Token, register2Token);
-			return -1;
-		}
+		int register2 = ExtractRegister();
+		if (register2 == -1) return -1;
 
-		uint32_t instruction = 0;
-		int register1 = atoi(register1Token + 1);
-		int register2 = atoi(register2Token + 1);
-
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::NEQ);
-		instruction = BitManipulation::WriteSecond8(instruction, register1);
-		instruction = BitManipulation::WriteThird8(instruction, register2);
-
-		return instruction;
+		return EncodeInstruction(Opcodes::NEQ, register1, register2, -1, 0);
 	}
 
 	uint32_t Parser::HandleGt()
 	{
-		char* register1Token = strtok(NULL, split);
-		char* register2Token = strtok(NULL, split);
+		int register1 = ExtractRegister();
+		if (register1 == -1) return -1;
 
-		if (register1Token[0] != '$' || register2Token[0] != '$')
-		{
-			printf("Unknown register value: %s %s", register1Token, register2Token);
-			return -1;
-		}
+		int register2 = ExtractRegister();
+		if (register2 == -1) return -1;
 
-		uint32_t instruction = 0;
-		int register1 = atoi(register1Token + 1);
-		int register2 = atoi(register2Token + 1);
-
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::GT);
-		instruction = BitManipulation::WriteSecond8(instruction, register1);
-		instruction = BitManipulation::WriteThird8(instruction, register2);
-
-		return instruction;
+		return EncodeInstruction(Opcodes::GT, register1, register2, -1, 0);
 	}
 
 	uint32_t Parser::HandleLt()
 	{
-		char* register1Token = strtok(NULL, split);
-		char* register2Token = strtok(NULL, split);
+		int register1 = ExtractRegister();
+		if (register1 == -1) return -1;
 
-		if (register1Token[0] != '$' || register2Token[0] != '$')
-		{
-			printf("Unknown register value: %s %s", register1Token, register2Token);
-			return -1;
-		}
+		int register2 = ExtractRegister();
+		if (register2 == -1) return -1;
 
-		uint32_t instruction = 0;
-		int register1 = atoi(register1Token + 1);
-		int register2 = atoi(register2Token + 1);
-
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::LT);
-		instruction = BitManipulation::WriteSecond8(instruction, register1);
-		instruction = BitManipulation::WriteThird8(instruction, register2);
-
-		return instruction;
+		return EncodeInstruction(Opcodes::LT, register1, register2, -1, 0);
 	}
 
 	uint32_t Parser::HandleGtq()
 	{
-		char* register1Token = strtok(NULL, split);
-		char* register2Token = strtok(NULL, split);
+		int register1 = ExtractRegister();
+		if (register1 == -1) return -1;
 
-		if (register1Token[0] != '$' || register2Token[0] != '$')
-		{
-			printf("Unknown register value: %s %s", register1Token, register2Token);
-			return -1;
-		}
+		int register2 = ExtractRegister();
+		if (register2 == -1) return -1;
 
-		uint32_t instruction = 0;
-		int register1 = atoi(register1Token + 1);
-		int register2 = atoi(register2Token + 1);
-
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::GTQ);
-		instruction = BitManipulation::WriteSecond8(instruction, register1);
-		instruction = BitManipulation::WriteThird8(instruction, register2);
-
-		return instruction;
+		return EncodeInstruction(Opcodes::GTQ, register1, register2, -1, 0);
 	}
 
 	uint32_t Parser::HandleLtq()
 	{
-		char* register1Token = strtok(NULL, split);
-		char* register2Token = strtok(NULL, split);
+		int register1 = ExtractRegister();
+		if (register1 == -1) return -1;
 
-		if (register1Token[0] != '$' || register2Token[0] != '$')
-		{
-			printf("Unknown register value: %s %s", register1Token, register2Token);
-			return -1;
-		}
+		int register2 = ExtractRegister();
+		if (register2 == -1) return -1;
 
-		uint32_t instruction = 0;
-		int register1 = atoi(register1Token + 1);
-		int register2 = atoi(register2Token + 1);
-
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::LTQ);
-		instruction = BitManipulation::WriteSecond8(instruction, register1);
-		instruction = BitManipulation::WriteThird8(instruction, register2);
-
-		return instruction;
+		return EncodeInstruction(Opcodes::LTQ, register1, register2, -1, 0);
 	}
 
 	uint32_t Parser::HandleJeq()
 	{
 		char* jmpTargetToken = strtok(NULL, split);
-
-		uint32_t instruction = 0;
 		uint16_t jmpTarget = atoi(jmpTargetToken);
 
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::JEQ);
-		instruction = BitManipulation::WriteLast16(instruction, jmpTarget);
-
-		return instruction;
+		return EncodeInstruction(Opcodes::JEQ, -1, -1, -1, jmpTarget);
 	}
 
 	uint32_t Parser::HandleJneq()
 	{
 		char* jmpTargetToken = strtok(NULL, split);
-
-		uint32_t instruction = 0;
 		uint16_t jmpTarget = atoi(jmpTargetToken);
 
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::JNEQ);
-		instruction = BitManipulation::WriteLast16(instruction, jmpTarget);
-
-		return instruction;
+		return EncodeInstruction(Opcodes::JNEQ, -1, -1, -1, jmpTarget);
 	}
 
 	uint32_t Parser::HandleHalt()
 	{
-		char* jmpTargetToken = strtok(NULL, split);
-		return 0;
+		// Halt does not require any arguments
+		return EncodeInstruction(Opcodes::HLT, -1, -1, -1, 0);
 	}
 
 	uint32_t Parser::HandleAloc()
 	{
 		char* alocSizeToken = strtok(NULL, split);
-
-		uint32_t instruction = 0;
 		uint16_t alocSize = atoi(alocSizeToken);
 
-		instruction = BitManipulation::WriteFirst8(instruction, Opcodes::ALOC);
-		instruction = BitManipulation::WriteLast16(instruction, alocSize);
-
-		return instruction;
+		return EncodeInstruction(Opcodes::ALOC, -1, -1, -1, alocSize);
 	}
 }

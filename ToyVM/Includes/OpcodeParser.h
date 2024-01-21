@@ -24,5 +24,7 @@ namespace Parser
 	uint32_t HandleAloc();
 	uint32_t ParseFile(const char* file_path, uint32_t* program);
 	uint32_t ParseInstruction(const char* instruction);
+	int ExtractRegister();
+	uint32_t EncodeInstruction(uint8_t opcode, int reg1, int reg2, int reg3, uint16_t value);
 }
 #endif // !PARSER_H
