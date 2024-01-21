@@ -1,17 +1,18 @@
 #include <memory>
 #include <windows.h>
 
-#include "Vm.h"
-#include "Opcodes.h"
-#include "VmExecutor.h"
-#include "BitManipulation.h"
+#include "../Includes/Vm.h"
+#include "../Includes/Opcodes.h"
+#include "../Includes/VmExecutor.h"
+#include "../Includes/BitManipulation.h"
+#include "../Includes/VmMain.h"
 
 namespace VmMain
 {
 	Vm::VM* VmInstance;
 	size_t ProgramSize;
 
-	bool Initialize(uint32_t* program, size_t programSize)
+	bool VmMain::Initialize(uint32_t* program, size_t programSize)
 	{
 		ProgramSize = programSize;
 
@@ -50,7 +51,7 @@ namespace VmMain
 		return true;
 	}
 
-	void Run()
+	void VmMain::Run()
 	{
 		bool running = true;
 		while (running)
@@ -127,12 +128,12 @@ namespace VmMain
 		}
 	}
 
-	void Dispose()
+	void VmMain::Dispose()
 	{
 		free(VmInstance);
 	}
 
-	Vm::VM* GetInstance()
+	Vm::VM* VmMain::GetInstance()
 	{
 		return VmInstance;
 	}

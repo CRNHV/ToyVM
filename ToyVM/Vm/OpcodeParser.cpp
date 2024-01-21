@@ -1,9 +1,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <cstdint>
 #include <string>
-#include "parser.h"
-#include "BitManipulation.h"
-#include "opcodes.h"
+#include "../Includes/OpcodeParser.h"
+#include "../Includes/BitManipulation.h"
+#include "../Includes/opcodes.h"
 
 namespace Parser
 {
@@ -37,7 +37,7 @@ namespace Parser
 	const char split[2] = " ";
 	const int instructionTableSize = sizeof(instructionTable) / sizeof(instructionTable[0]);
 
-	uint32_t ParseInstruction(const char* instruction)
+	uint32_t Parser::ParseInstruction(const char* instruction)
 	{
 		for (int i = 0; i < instructionTableSize; i++)
 		{
@@ -49,7 +49,7 @@ namespace Parser
 		printf("Unknown instruction: %s\n", instruction);
 	}
 
-	uint32_t ParseFile(const char* file_path, uint32_t* program)
+	uint32_t Parser::ParseFile(const char* file_path, uint32_t* program)
 	{
 		FILE* file = fopen(file_path, "r");
 		if (file == NULL) {
@@ -81,7 +81,7 @@ namespace Parser
 		return programSize;
 	}
 
-	uint32_t HandleLoad()
+	uint32_t Parser::HandleLoad()
 	{
 		char* registerToken = strtok(NULL, split);
 
@@ -102,7 +102,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleAdd()
+	uint32_t Parser::HandleAdd()
 	{
 		char* register1Token = strtok(NULL, split);
 		char* register2Token = strtok(NULL, split);
@@ -126,7 +126,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleDiv()
+	uint32_t Parser::HandleDiv()
 	{
 		char* register1Token = strtok(NULL, split);
 		char* register2Token = strtok(NULL, split);
@@ -150,7 +150,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleSub()
+	uint32_t Parser::HandleSub()
 	{
 		char* register1Token = strtok(NULL, split);
 		char* register2Token = strtok(NULL, split);
@@ -174,7 +174,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleMul()
+	uint32_t Parser::HandleMul()
 	{
 		char* register1Token = strtok(NULL, split);
 		char* register2Token = strtok(NULL, split);
@@ -198,7 +198,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleJmp()
+	uint32_t Parser::HandleJmp()
 	{
 		char* jmpTargetToken = strtok(NULL, split);
 
@@ -210,7 +210,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleJmpf()
+	uint32_t Parser::HandleJmpf()
 	{
 		char* jmpTargetToken = strtok(NULL, split);
 
@@ -221,7 +221,7 @@ namespace Parser
 		instruction = BitManipulation::WriteLast16(instruction, jmpTarget);
 		return instruction;
 	}
-	uint32_t HandleJmpb()
+	uint32_t Parser::HandleJmpb()
 	{
 		char* jmpTargetToken = strtok(NULL, split);
 
@@ -233,7 +233,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleEq()
+	uint32_t Parser::HandleEq()
 	{
 		char* register1Token = strtok(NULL, split);
 		char* register2Token = strtok(NULL, split);
@@ -253,7 +253,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleNeq()
+	uint32_t Parser::HandleNeq()
 	{
 		char* register1Token = strtok(NULL, split);
 		char* register2Token = strtok(NULL, split);
@@ -275,7 +275,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleGt()
+	uint32_t Parser::HandleGt()
 	{
 		char* register1Token = strtok(NULL, split);
 		char* register2Token = strtok(NULL, split);
@@ -297,7 +297,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleLt()
+	uint32_t Parser::HandleLt()
 	{
 		char* register1Token = strtok(NULL, split);
 		char* register2Token = strtok(NULL, split);
@@ -319,7 +319,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleGtq()
+	uint32_t Parser::HandleGtq()
 	{
 		char* register1Token = strtok(NULL, split);
 		char* register2Token = strtok(NULL, split);
@@ -341,7 +341,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleLtq()
+	uint32_t Parser::HandleLtq()
 	{
 		char* register1Token = strtok(NULL, split);
 		char* register2Token = strtok(NULL, split);
@@ -363,7 +363,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleJeq()
+	uint32_t Parser::HandleJeq()
 	{
 		char* jmpTargetToken = strtok(NULL, split);
 
@@ -376,7 +376,7 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleJneq()
+	uint32_t Parser::HandleJneq()
 	{
 		char* jmpTargetToken = strtok(NULL, split);
 
@@ -389,13 +389,13 @@ namespace Parser
 		return instruction;
 	}
 
-	uint32_t HandleHalt()
+	uint32_t Parser::HandleHalt()
 	{
 		char* jmpTargetToken = strtok(NULL, split);
 		return 0;
 	}
 
-	uint32_t HandleAloc()
+	uint32_t Parser::HandleAloc()
 	{
 		char* alocSizeToken = strtok(NULL, split);
 

@@ -18,43 +18,40 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VmExecutor.cpp">
+    <ClCompile Include="Vm\BitManipulation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VmMain.cpp">
+    <ClCompile Include="Vm\OpcodeParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Vm.cpp">
+    <ClCompile Include="Vm\Vm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Parser.cpp">
+    <ClCompile Include="Vm\VmExecutor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Parser.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BitManipulation.cpp">
+    <ClCompile Include="Vm\VmMain.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BitManipulation.h">
-      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Opcodes.h">
+    <ClInclude Include="Includes\BitManipulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VmExecutor.h">
+    <ClInclude Include="Includes\Opcodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VmMain.h">
+    <ClInclude Include="Includes\OpcodeParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Vm.h">
+    <ClInclude Include="Includes\VmExecutor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="main.toy" />
+    <ClInclude Include="Includes\VmMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Vm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

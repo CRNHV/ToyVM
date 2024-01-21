@@ -23,5 +23,6 @@ namespace Parser
 	uint32_t HandleHalt();
 	uint32_t HandleAloc();
 	uint32_t ParseFile(const char* file_path, uint32_t* program);
+	uint32_t ParseInstruction(const char* instruction);
 }
 #endif // !PARSER_H

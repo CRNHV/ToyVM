@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{22108e09-ef3e-4be7-a4a5-228b0d7ae31c}</ProjectGuid>
+    <ProjectGuid>{f104350e-33b7-4019-a688-93daa4a5cd96}</ProjectGuid>
     <RootNamespace>ToyVM</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -127,29 +127,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BitManipulation.h" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Parser.cpp" />
-    <ClCompile Include="Parser.h" />
-    <ClCompile Include="BitManipulation.cpp" />
-    <ClCompile Include="Vm.cpp" />
-    <ClCompile Include="VmExecutor.cpp" />
-    <ClCompile Include="VmMain.cpp" />
+    <ClCompile Include="Vm\BitManipulation.cpp" />
+    <ClCompile Include="Vm\OpcodeParser.cpp" />
+    <ClCompile Include="Vm\Vm.cpp" />
+    <ClCompile Include="Vm\VmExecutor.cpp" />
+    <ClCompile Include="Vm\VmMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Opcodes.h" />
-    <ClInclude Include="Vm.h" />
-    <ClInclude Include="VmExecutor.h" />
-    <ClInclude Include="VmMain.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="main.toy">
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="main.toy">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <ClInclude Include="Includes\BitManipulation.h" />
+    <ClInclude Include="Includes\Opcodes.h" />
+    <ClInclude Include="Includes\OpcodeParser.h" />
+    <ClInclude Include="Includes\Vm.h" />
+    <ClInclude Include="Includes\VmExecutor.h" />
+    <ClInclude Include="Includes\VmMain.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

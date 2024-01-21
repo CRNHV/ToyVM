@@ -2,8 +2,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <memory>
 #include <stdio.h>
-#include "vmmain.h"
-#include "parser.h"
+#include "Includes/BitManipulation.h"
+#include "Includes/OpcodeParser.h"
+#include "Includes/VmMain.h"
 
 void WriteFile(uint32_t* data, size_t size);
 
