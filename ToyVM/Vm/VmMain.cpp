@@ -1,6 +1,6 @@
-#include <memory>
+#include <memory.h>
+#include <stdio.h>
 #include <windows.h>
-
 #include "../Includes/BitManipulation.h"
 #include "../Includes/Opcodes.h"
 #include "../Includes/Vm.h"
@@ -19,8 +19,10 @@ namespace VmMain
 	} OpcodeHandler;
 
 	OpcodeHandler opcodeHandlers[] = {
+		{Opcodes::OpCode::HALT, nullptr},
 		{Opcodes::OpCode::LOAD, VmExecutor::ExecuteLoad},
-		{Opcodes::OpCode::ADD, VmExecutor::ExecuteAdd},
+		{Opcodes::OpCode::ADDR, VmExecutor::ExecuteAddR},
+		{Opcodes::OpCode::ADDI, VmExecutor::ExecuteAddI},
 		{Opcodes::OpCode::SUB, VmExecutor::ExecuteSub},
 		{Opcodes::OpCode::MUL, VmExecutor::ExecuteMul},
 		{Opcodes::OpCode::DIV, VmExecutor::ExecuteDiv},
@@ -36,7 +38,6 @@ namespace VmMain
 		{Opcodes::OpCode::JEQ, VmExecutor::ExecuteJEQ},
 		{Opcodes::OpCode::JNEQ, VmExecutor::ExecuteJNEQ},
 		{Opcodes::OpCode::SET, VmExecutor::ExecuteSet},
-		{Opcodes::OpCode::ALOC, VmExecutor::ExecuteAloc},
 	};
 
 	bool VmMain::Initialize(uint32_t* program, size_t programSize)
@@ -80,8 +81,7 @@ namespace VmMain
 
 	void VmMain::Run()
 	{
-		bool running = true;
-		while (running)
+		while (true)
 		{
 			if (VmInstance->pc > ProgramSize)
 			{
@@ -89,15 +89,15 @@ namespace VmMain
 			}
 
 			uint32_t nextInstruction = Vm::NextInstruction(VmInstance);
-			int8_t opcode = BitManipulation::ReadFirst8(nextInstruction);
+			Opcodes::OpCode opcode = (Opcodes::OpCode)BitManipulation::ReadFirst8(nextInstruction);
 
-			if (opcode == Opcodes::HLT)
+			if (opcode == Opcodes::HALT)
 			{
-				running = false;
 				break;
 			}
 
-			opcodeHandlers[opcode].executionFunction(VmInstance, nextInstruction);
+			OpcodeHandler handler = opcodeHandlers[opcode];
+			handler.executionFunction(VmInstance, nextInstruction);
 		}
 	}
 

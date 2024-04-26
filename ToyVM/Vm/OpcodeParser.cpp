@@ -14,8 +14,10 @@ namespace Parser
 	} InstructionEntry;
 
 	InstructionEntry instructionTable[] = {
+		{"HALT", HandleHalt},
 		{"LOAD", HandleLoad},
-		{"ADD", HandleAdd},
+		{"ADDR", HandleAddR},
+		{"ADDI", HandleAddI},
 		{"SUB", HandleSub},
 		{"MUL", HandleMul},
 		{"DIV", HandleDiv},
@@ -31,23 +33,10 @@ namespace Parser
 		{"JEQ", HandleJeq},
 		{"JNEQ", HandleJneq},
 		{"SET", HandleSet},
-		{"HALT", HandleHalt},
-		{"ALOC", HandleAloc},
 	};
 
 	const char split[2] = " ";
 	const int instructionTableSize = sizeof(instructionTable) / sizeof(instructionTable[0]);
-
-	unsigned long hash(unsigned char* str)
-	{
-		unsigned long hash = 5381;
-		int c;
-
-		while (c = *str++)
-			hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-
-		return hash;
-	}
 
 	uint32_t Parser::ParseInstruction(const char* instruction)
 	{
@@ -90,6 +79,8 @@ namespace Parser
 				continue;
 			}
 
+
+			token[strcspn(token, "\n")] = 0;
 
 			uint32_t instruction = ParseInstruction(token);
 			if (instruction == -1)
@@ -174,7 +165,7 @@ namespace Parser
 		return EncodeInstruction(Opcodes::LOAD, registerNumber, valueNumber);
 	}
 
-	uint32_t Parser::HandleAdd()
+	uint32_t Parser::HandleAddR()
 	{
 		uint8_t register1 = ExtractRegister();
 		if (register1 == -1) return -1;
@@ -185,7 +176,21 @@ namespace Parser
 		uint8_t register3 = ExtractRegister();
 		if (register3 == -1) return -1;
 
-		return EncodeInstruction(Opcodes::ADD, register1, register2, register3);
+		return EncodeInstruction(Opcodes::ADDR, register1, register2, register3);
+	}
+
+	uint32_t Parser::HandleAddI()
+	{
+		uint8_t register1 = ExtractRegister();
+		if (register1 == -1) return -1;
+
+		char* jmpTargetToken = strtok(NULL, split);
+		uint8_t addValue = atoi(jmpTargetToken);
+
+		uint8_t register3 = ExtractRegister();
+		if (register3 == -1) return -1;
+
+		return EncodeInstruction(Opcodes::ADDI, register1, addValue, register3);
 	}
 
 	uint32_t Parser::HandleJmp()
@@ -339,15 +344,7 @@ namespace Parser
 	uint32_t Parser::HandleHalt()
 	{
 		// Halt does not require any arguments
-		return EncodeInstruction(Opcodes::HLT, (uint8_t)0);
-	}
-
-	uint32_t Parser::HandleAloc()
-	{
-		char* alocSizeToken = strtok(NULL, split);
-		uint16_t alocSize = atoi(alocSizeToken);
-
-		return EncodeInstruction(Opcodes::ALOC, alocSize);
+		return EncodeInstruction(Opcodes::HALT, (uint8_t)0);
 	}
 
 	uint32_t Parser::HandleSet()

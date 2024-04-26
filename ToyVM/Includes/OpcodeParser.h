@@ -5,7 +5,8 @@
 namespace Parser
 {
 	uint32_t HandleLoad();
-	uint32_t HandleAdd();
+	uint32_t HandleAddR();
+	uint32_t HandleAddI();
 	uint32_t HandleDiv();
 	uint32_t HandleSub();
 	uint32_t HandleMul();
@@ -21,7 +22,6 @@ namespace Parser
 	uint32_t HandleJeq();
 	uint32_t HandleJneq();
 	uint32_t HandleHalt();
-	uint32_t HandleAloc();
 	uint32_t HandleSet();
 
 

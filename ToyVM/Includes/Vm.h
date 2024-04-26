@@ -7,7 +7,6 @@ namespace Vm
 	typedef struct
 	{
 		uint32_t registers[32];
-		uint32_t* handles[32];
 		uint32_t* program;
 		uint32_t* heap;
 		uint16_t heapSize;

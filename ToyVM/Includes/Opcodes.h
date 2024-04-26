@@ -4,9 +4,10 @@ namespace Opcodes
 {
 	typedef enum
 	{
-		HLT, // Halt
+		HALT, // Halt
 		LOAD, // Load
-		ADD, // Add
+		ADDR, // Add register values
+		ADDI, // Add immediate value
 		SUB, // Substract
 		MUL, // Multiply
 		DIV, // Divide
@@ -21,10 +22,6 @@ namespace Opcodes
 		LTQ, // Less than or equal to
 		JEQ, // Jump if equal
 		JNEQ, // Jump if not equal
-		ALOC, // Allocate memory
-		FREE, // Free memory
-		MODULE, // GetModuleHandle
-		GETPROC, // GetProcAddress
 		SET, // Set register to value of other register
 
 	} OpCode;

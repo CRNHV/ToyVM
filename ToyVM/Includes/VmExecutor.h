@@ -6,7 +6,8 @@
 namespace VmExecutor
 {
 	void ExecuteLoad(Vm::VM* vmInstance, uint32_t instruction);
-	void ExecuteAdd(Vm::VM* vmInstance, uint32_t instruction);
+	void ExecuteAddR(Vm::VM* vmInstance, uint32_t instruction);
+	void ExecuteAddI(Vm::VM* vmInstance, uint32_t instruction);
 	void ExecuteSub(Vm::VM* vmInstance, uint32_t instruction);
 	void ExecuteMul(Vm::VM* vmInstance, uint32_t instruction);
 	void ExecuteDiv(Vm::VM* vmInstance, uint32_t instruction);
@@ -21,7 +22,6 @@ namespace VmExecutor
 	void ExecuteLTQ(Vm::VM* vmInstance, uint32_t instruction);
 	void ExecuteJEQ(Vm::VM* vmInstance, uint32_t instruction);
 	void ExecuteJNEQ(Vm::VM* vmInstance, uint32_t instruction);
-	void ExecuteAloc(Vm::VM* vmInstance, uint32_t instruction);
 	void ExecuteSet(Vm::VM* vmInstance, uint32_t instruction);
 }
 #endif // !VMEXECUTOR_H
