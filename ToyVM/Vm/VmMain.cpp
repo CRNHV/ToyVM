@@ -12,6 +12,33 @@ namespace VmMain
 	Vm::VM* VmInstance;
 	size_t ProgramSize;
 
+	typedef struct
+	{
+		Opcodes::OpCode Opcode;
+		void(*executionFunction)(Vm::VM* vmInstance, uint32_t instruction);
+	} OpcodeHandler;
+
+	OpcodeHandler opcodeHandlers[] = {
+		{Opcodes::OpCode::LOAD, VmExecutor::ExecuteLoad},
+		{Opcodes::OpCode::ADD, VmExecutor::ExecuteAdd},
+		{Opcodes::OpCode::SUB, VmExecutor::ExecuteSub},
+		{Opcodes::OpCode::MUL, VmExecutor::ExecuteMul},
+		{Opcodes::OpCode::DIV, VmExecutor::ExecuteDiv},
+		{Opcodes::OpCode::JMP, VmExecutor::ExecuteJmp},
+		{Opcodes::OpCode::JMPF, VmExecutor::ExecuteJmpf},
+		{Opcodes::OpCode::JMPB, VmExecutor::ExecuteJmpb},
+		{Opcodes::OpCode::EQ, VmExecutor::ExecuteEq},
+		{Opcodes::OpCode::NEQ, VmExecutor::ExecuteNEQ},
+		{Opcodes::OpCode::GT, VmExecutor::ExecuteGT},
+		{Opcodes::OpCode::LT, VmExecutor::ExecuteLT},
+		{Opcodes::OpCode::GTQ, VmExecutor::ExecuteGTQ},
+		{Opcodes::OpCode::LTQ, VmExecutor::ExecuteLTQ},
+		{Opcodes::OpCode::JEQ, VmExecutor::ExecuteJEQ},
+		{Opcodes::OpCode::JNEQ, VmExecutor::ExecuteJNEQ},
+		{Opcodes::OpCode::SET, VmExecutor::ExecuteSet},
+		{Opcodes::OpCode::ALOC, VmExecutor::ExecuteAloc},
+	};
+
 	bool VmMain::Initialize(uint32_t* program, size_t programSize)
 	{
 		ProgramSize = programSize;
@@ -64,68 +91,13 @@ namespace VmMain
 			uint32_t nextInstruction = Vm::NextInstruction(VmInstance);
 			int8_t opcode = BitManipulation::ReadFirst8(nextInstruction);
 
-			switch (opcode)
+			if (opcode == Opcodes::HLT)
 			{
-			case Opcodes::HLT:
 				running = false;
 				break;
-			case Opcodes::LOAD:
-				VmExecutor::ExecuteLoad(VmInstance, nextInstruction);
-				break;
-			case Opcodes::ADD:
-				VmExecutor::ExecuteAdd(VmInstance, nextInstruction);
-				break;
-			case Opcodes::SUB:
-				VmExecutor::ExecuteSub(VmInstance, nextInstruction);
-				break;
-			case Opcodes::MUL:
-				VmExecutor::ExecuteMul(VmInstance, nextInstruction);
-				break;
-			case Opcodes::DIV:
-				VmExecutor::ExecuteDiv(VmInstance, nextInstruction);
-				break;
-			case Opcodes::JMP:
-				VmExecutor::ExecuteJmp(VmInstance, nextInstruction);
-				break;
-			case Opcodes::JMPF:
-				VmExecutor::ExecuteJmpf(VmInstance, nextInstruction);
-				break;
-			case Opcodes::JMPB:
-				VmExecutor::ExecuteJmpb(VmInstance, nextInstruction);
-				break;
-			case Opcodes::EQ:
-				VmExecutor::ExecuteEq(VmInstance, nextInstruction);
-				break;
-			case Opcodes::NEQ:
-				VmExecutor::ExecuteNEQ(VmInstance, nextInstruction);
-				break;
-			case Opcodes::GT:
-				VmExecutor::ExecuteGT(VmInstance, nextInstruction);
-				break;
-			case Opcodes::LT:
-				VmExecutor::ExecuteLT(VmInstance, nextInstruction);
-				break;
-			case Opcodes::GTQ:
-				VmExecutor::ExecuteGTQ(VmInstance, nextInstruction);
-				break;
-			case Opcodes::LTQ:
-				VmExecutor::ExecuteLTQ(VmInstance, nextInstruction);
-				break;
-			case Opcodes::JEQ:
-				VmExecutor::ExecuteJEQ(VmInstance, nextInstruction);
-				break;
-			case Opcodes::JNEQ:
-				VmExecutor::ExecuteJNEQ(VmInstance, nextInstruction);
-				break;
-			case Opcodes::ALOC:
-				VmExecutor::ExecuteAloc(VmInstance, nextInstruction);
-				break;
-			case Opcodes::SET:
-				VmExecutor::ExecuteSet(VmInstance, nextInstruction);
-				break;
-			case Opcodes::FREE:
-				break;
 			}
+
+			opcodeHandlers[opcode].executionFunction(VmInstance, nextInstruction);
 		}
 	}
 
