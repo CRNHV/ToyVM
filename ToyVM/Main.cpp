@@ -1,5 +1,7 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
+#include <chrono>
+#include <iostream>
 #include <memory>
 #include <stdio.h>
 #include "Includes/BitManipulation.h"
@@ -7,6 +9,20 @@
 #include "Includes/VmMain.h"
 
 void WriteFile(uint32_t* data, size_t size);
+
+int fib(int n)
+{
+	int a = 0, b = 1, c, i;
+	if (n == 0)
+		return a;
+	for (i = 2; i <= n; i++)
+	{
+		c = a + b;
+		a = b;
+		b = c;
+	}
+	return b;
+}
 
 int main()
 {
@@ -24,7 +40,13 @@ int main()
 		return 1;
 	}
 	free(program);
+
+	std::chrono::steady_clock::time_point vmBegin = std::chrono::steady_clock::now();
 	VmMain::Run();
+	std::chrono::steady_clock::time_point vmEnd = std::chrono::steady_clock::now();
+
+	std::cout << "Fib calc time = " << std::chrono::duration_cast<std::chrono::nanoseconds>(vmEnd - vmBegin).count() << "[nanoseconds]" << std::endl;
+
 	VmMain::Dispose();
 
 	return 0;

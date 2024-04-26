@@ -1,14 +1,18 @@
-LOAD $0 50
-LOAD $1 50
-ADD $0 $1 $2
-LOAD $3 100
-EQ $2 $3
-JEQ 10
 LOAD $0 0
-LOAD $1 0
-LOAD $2 0
-NEQ $0 $1
-JNEQ 1
-GT $01 $0 
-LT $01 $0
+LOAD $1 1
+LOAD $2 0		; Our loop counter
+LOAD $3 0		; Calculation result
+LOAD $4 20		; Max loop count
+
+; Special register for storing 1 because I don't have immediate values
+LOAD $5 1		
+
+EQ $2 $4		; Check loop condition
+JEQ 14			; Exit loop
+ADD $0 $1 $3	; Calc fib
+SET $0 $1		; Store result
+SET $1 $3		; Store prev fib number
+ADD $2 $5 $2	; Add reg 5 (value: 1) to reg 2 
+JMPB 8			; Loop :)
+
 HALT

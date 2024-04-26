@@ -1,7 +1,7 @@
 #ifndef VMEXECUTOR_H
 #define VMEXECUTOR_H
-#include "vm.h"
 #include <cstdint>
+#include "vm.h"
 
 namespace VmExecutor
 {
@@ -22,5 +22,6 @@ namespace VmExecutor
 	void ExecuteJEQ(Vm::VM* vmInstance, uint32_t instruction);
 	void ExecuteJNEQ(Vm::VM* vmInstance, uint32_t instruction);
 	void ExecuteAloc(Vm::VM* vmInstance, uint32_t instruction);
+	void ExecuteSet(Vm::VM* vmInstance, uint32_t instruction);
 }
 #endif // !VMEXECUTOR_H

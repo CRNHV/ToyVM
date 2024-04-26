@@ -22,9 +22,17 @@ namespace Parser
 	uint32_t HandleJneq();
 	uint32_t HandleHalt();
 	uint32_t HandleAloc();
+	uint32_t HandleSet();
+
+
 	uint32_t ParseFile(const char* file_path, uint32_t* program);
 	uint32_t ParseInstruction(const char* instruction);
 	int ExtractRegister();
-	uint32_t EncodeInstruction(uint8_t opcode, int reg1, int reg2, int reg3, uint16_t value);
+	uint32_t EncodeInstruction(uint8_t opcode, uint8_t reg1, uint8_t reg2, uint8_t reg3);
+	uint32_t EncodeInstruction(uint8_t opcode, uint16_t value);
+	uint32_t EncodeInstruction(uint8_t opcode, uint8_t reg1, uint16_t value);
+	uint32_t EncodeInstruction(uint8_t opcode, uint8_t reg1, uint8_t reg2, uint8_t reg3);
+	uint32_t EncodeInstruction(uint8_t opcode, uint8_t reg1, uint8_t reg2);
+	uint32_t EncodeInstruction(uint8_t opcode, uint8_t reg1);
 }
 #endif // !PARSER_H

@@ -23,6 +23,9 @@ namespace Opcodes
 		JNEQ, // Jump if not equal
 		ALOC, // Allocate memory
 		FREE, // Free memory
+		MODULE, // GetModuleHandle
+		GETPROC, // GetProcAddress
+		SET, // Set register to value of other register
 
 	} OpCode;
 }

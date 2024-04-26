@@ -1,8 +1,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <cstdint>
 #include <string>
-#include "../Includes/OpcodeParser.h"
 #include "../Includes/BitManipulation.h"
+#include "../Includes/OpcodeParser.h"
 #include "../Includes/opcodes.h"
 
 namespace Parser
@@ -30,12 +30,24 @@ namespace Parser
 		{"LTQ", HandleLtq},
 		{"JEQ", HandleJeq},
 		{"JNEQ", HandleJneq},
+		{"SET", HandleSet},
 		{"HALT", HandleHalt},
-		{"ALOC", HandleAloc}
+		{"ALOC", HandleAloc},
 	};
 
 	const char split[2] = " ";
 	const int instructionTableSize = sizeof(instructionTable) / sizeof(instructionTable[0]);
+
+	unsigned long hash(unsigned char* str)
+	{
+		unsigned long hash = 5381;
+		int c;
+
+		while (c = *str++)
+			hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+		return hash;
+	}
 
 	uint32_t Parser::ParseInstruction(const char* instruction)
 	{
@@ -66,8 +78,19 @@ namespace Parser
 		while (fgets(lineBuffer, 512, file) != NULL)
 		{
 			char* token;
-
 			token = strtok(lineBuffer, split);
+
+			if (strcmp(token, "\n") == 0)
+			{
+				continue;
+			}
+
+			if (strcmp(token, ";") == 0)
+			{
+				continue;
+			}
+
+
 			uint32_t instruction = ParseInstruction(token);
 			if (instruction == -1)
 			{
@@ -94,41 +117,75 @@ namespace Parser
 		return atoi(token + 1);
 	}
 
-	uint32_t Parser::EncodeInstruction(uint8_t opcode, int reg1, int reg2, int reg3, uint16_t value)
+	uint32_t Parser::EncodeInstruction(uint8_t opcode, uint8_t reg1, uint8_t reg2, uint8_t reg3)
 	{
 		uint32_t instruction = 0;
 		instruction = BitManipulation::WriteFirst8(instruction, opcode);
-		if (reg1 != -1) instruction = BitManipulation::WriteSecond8(instruction, reg1);
-		if (reg2 != -1) instruction = BitManipulation::WriteThird8(instruction, reg2);
-		if (reg3 != -1) instruction = BitManipulation::WriteLast8(instruction, reg3);
-		if (value != 0) instruction = BitManipulation::WriteLast16(instruction, value);
+		instruction = BitManipulation::WriteSecond8(instruction, reg1);
+		instruction = BitManipulation::WriteThird8(instruction, reg2);
+		instruction = BitManipulation::WriteLast8(instruction, reg3);
+
 		return instruction;
 	}
 
-	// Refactored methods (example for HandleLoad, HandleAdd, and HandleJmp)
+	uint32_t EncodeInstruction(uint8_t opcode, uint16_t value)
+	{
+		uint32_t instruction = 0;
+		instruction = BitManipulation::WriteFirst8(instruction, opcode);
+		instruction = BitManipulation::WriteLast16(instruction, value);
+
+		return instruction;
+	}
+	uint32_t EncodeInstruction(uint8_t opcode, uint8_t reg1, uint16_t value)
+	{
+		uint32_t instruction = 0;
+		instruction = BitManipulation::WriteFirst8(instruction, opcode);
+		instruction = BitManipulation::WriteSecond8(instruction, reg1);
+		instruction = BitManipulation::WriteLast16(instruction, value);
+
+		return instruction;
+	}
+
+	uint32_t EncodeInstruction(uint8_t opcode, uint8_t reg1, uint8_t reg2)
+	{
+		uint32_t instruction = 0;
+		instruction = BitManipulation::WriteFirst8(instruction, opcode);
+		instruction = BitManipulation::WriteSecond8(instruction, reg1);
+		instruction = BitManipulation::WriteThird8(instruction, reg2);
+
+		return instruction;
+	}
+	uint32_t EncodeInstruction(uint8_t opcode, uint8_t reg1)
+	{
+		uint32_t instruction = 0;
+		instruction = BitManipulation::WriteFirst8(instruction, opcode);
+		instruction = BitManipulation::WriteSecond8(instruction, reg1);
+		return instruction;
+	}
+
 	uint32_t Parser::HandleLoad()
 	{
-		int registerNumber = ExtractRegister();
+		uint8_t registerNumber = ExtractRegister();
 		if (registerNumber == -1) return -1;
 
 		char* valueToken = strtok(NULL, split);
-		int valueNumber = atoi(valueToken);
+		uint8_t valueNumber = atoi(valueToken);
 
-		return EncodeInstruction(Opcodes::LOAD, registerNumber, -1, -1, valueNumber);
+		return EncodeInstruction(Opcodes::LOAD, registerNumber, valueNumber);
 	}
 
 	uint32_t Parser::HandleAdd()
 	{
-		int register1 = ExtractRegister();
+		uint8_t register1 = ExtractRegister();
 		if (register1 == -1) return -1;
 
-		int register2 = ExtractRegister();
+		uint8_t register2 = ExtractRegister();
 		if (register2 == -1) return -1;
 
-		int register3 = ExtractRegister();
+		uint8_t register3 = ExtractRegister();
 		if (register3 == -1) return -1;
 
-		return EncodeInstruction(Opcodes::ADD, register1, register2, register3, 0);
+		return EncodeInstruction(Opcodes::ADD, register1, register2, register3);
 	}
 
 	uint32_t Parser::HandleJmp()
@@ -136,35 +193,35 @@ namespace Parser
 		char* jmpTargetToken = strtok(NULL, split);
 		uint16_t jmpTarget = atoi(jmpTargetToken);
 
-		return EncodeInstruction(Opcodes::JMP, -1, -1, -1, jmpTarget);
+		return EncodeInstruction(Opcodes::JMP, jmpTarget);
 	}
 
 	uint32_t Parser::HandleDiv()
 	{
-		int register1 = ExtractRegister();
+		uint8_t register1 = ExtractRegister();
 		if (register1 == -1) return -1;
 
-		int register2 = ExtractRegister();
+		uint8_t register2 = ExtractRegister();
 		if (register2 == -1) return -1;
 
-		int register3 = ExtractRegister();
+		uint8_t register3 = ExtractRegister();
 		if (register3 == -1) return -1;
 
-		return EncodeInstruction(Opcodes::DIV, register1, register2, register3, 0);
+		return EncodeInstruction(Opcodes::DIV, register1, register2, register3);
 	}
 
 	uint32_t Parser::HandleSub()
 	{
-		int register1 = ExtractRegister();
+		uint8_t register1 = ExtractRegister();
 		if (register1 == -1) return -1;
 
-		int register2 = ExtractRegister();
+		uint8_t register2 = ExtractRegister();
 		if (register2 == -1) return -1;
 
-		int register3 = ExtractRegister();
+		uint8_t register3 = ExtractRegister();
 		if (register3 == -1) return -1;
 
-		return EncodeInstruction(Opcodes::SUB, register1, register2, register3, 0);
+		return EncodeInstruction(Opcodes::SUB, register1, register2, register3);
 	}
 
 	uint32_t Parser::HandleMul()
@@ -178,7 +235,7 @@ namespace Parser
 		int register3 = ExtractRegister();
 		if (register3 == -1) return -1;
 
-		return EncodeInstruction(Opcodes::MUL, register1, register2, register3, 0);
+		return EncodeInstruction(Opcodes::MUL, register1, register2, register3);
 	}
 
 	uint32_t Parser::HandleJmpf()
@@ -186,7 +243,7 @@ namespace Parser
 		char* jmpTargetToken = strtok(NULL, split);
 		uint16_t jmpTarget = atoi(jmpTargetToken);
 
-		return EncodeInstruction(Opcodes::JMPF, -1, -1, -1, jmpTarget);
+		return EncodeInstruction(Opcodes::JMPF, jmpTarget);
 	}
 
 	uint32_t Parser::HandleJmpb()
@@ -194,73 +251,73 @@ namespace Parser
 		char* jmpTargetToken = strtok(NULL, split);
 		uint16_t jmpTarget = atoi(jmpTargetToken);
 
-		return EncodeInstruction(Opcodes::JMPB, -1, -1, -1, jmpTarget);
+		return EncodeInstruction(Opcodes::JMPB, jmpTarget);
 	}
 
 	uint32_t Parser::HandleEq()
 	{
-		int register1 = ExtractRegister();
+		uint8_t register1 = ExtractRegister();
 		if (register1 == -1) return -1;
 
-		int register2 = ExtractRegister();
+		uint8_t register2 = ExtractRegister();
 		if (register2 == -1) return -1;
 
-		return EncodeInstruction(Opcodes::EQ, register1, register2, -1, 0);
+		return EncodeInstruction(Opcodes::EQ, register1, register2);
 	}
 
 	uint32_t Parser::HandleNeq()
 	{
-		int register1 = ExtractRegister();
+		uint8_t register1 = ExtractRegister();
 		if (register1 == -1) return -1;
 
-		int register2 = ExtractRegister();
+		uint8_t register2 = ExtractRegister();
 		if (register2 == -1) return -1;
 
-		return EncodeInstruction(Opcodes::NEQ, register1, register2, -1, 0);
+		return EncodeInstruction(Opcodes::NEQ, register1, register2);
 	}
 
 	uint32_t Parser::HandleGt()
 	{
-		int register1 = ExtractRegister();
+		uint8_t register1 = ExtractRegister();
 		if (register1 == -1) return -1;
 
-		int register2 = ExtractRegister();
+		uint8_t register2 = ExtractRegister();
 		if (register2 == -1) return -1;
 
-		return EncodeInstruction(Opcodes::GT, register1, register2, -1, 0);
+		return EncodeInstruction(Opcodes::GT, register1, register2);
 	}
 
 	uint32_t Parser::HandleLt()
 	{
-		int register1 = ExtractRegister();
+		uint8_t register1 = ExtractRegister();
 		if (register1 == -1) return -1;
 
-		int register2 = ExtractRegister();
+		uint8_t register2 = ExtractRegister();
 		if (register2 == -1) return -1;
 
-		return EncodeInstruction(Opcodes::LT, register1, register2, -1, 0);
+		return EncodeInstruction(Opcodes::LT, register1, register2);
 	}
 
 	uint32_t Parser::HandleGtq()
 	{
-		int register1 = ExtractRegister();
+		uint8_t register1 = ExtractRegister();
 		if (register1 == -1) return -1;
 
-		int register2 = ExtractRegister();
+		uint8_t register2 = ExtractRegister();
 		if (register2 == -1) return -1;
 
-		return EncodeInstruction(Opcodes::GTQ, register1, register2, -1, 0);
+		return EncodeInstruction(Opcodes::GTQ, register1, register2);
 	}
 
 	uint32_t Parser::HandleLtq()
 	{
-		int register1 = ExtractRegister();
+		uint8_t register1 = ExtractRegister();
 		if (register1 == -1) return -1;
 
-		int register2 = ExtractRegister();
+		uint8_t register2 = ExtractRegister();
 		if (register2 == -1) return -1;
 
-		return EncodeInstruction(Opcodes::LTQ, register1, register2, -1, 0);
+		return EncodeInstruction(Opcodes::LTQ, register1, register2);
 	}
 
 	uint32_t Parser::HandleJeq()
@@ -268,7 +325,7 @@ namespace Parser
 		char* jmpTargetToken = strtok(NULL, split);
 		uint16_t jmpTarget = atoi(jmpTargetToken);
 
-		return EncodeInstruction(Opcodes::JEQ, -1, -1, -1, jmpTarget);
+		return EncodeInstruction(Opcodes::JEQ, jmpTarget);
 	}
 
 	uint32_t Parser::HandleJneq()
@@ -276,13 +333,13 @@ namespace Parser
 		char* jmpTargetToken = strtok(NULL, split);
 		uint16_t jmpTarget = atoi(jmpTargetToken);
 
-		return EncodeInstruction(Opcodes::JNEQ, -1, -1, -1, jmpTarget);
+		return EncodeInstruction(Opcodes::JNEQ, jmpTarget);
 	}
 
 	uint32_t Parser::HandleHalt()
 	{
 		// Halt does not require any arguments
-		return EncodeInstruction(Opcodes::HLT, -1, -1, -1, 0);
+		return EncodeInstruction(Opcodes::HLT, (uint8_t)0);
 	}
 
 	uint32_t Parser::HandleAloc()
@@ -290,6 +347,13 @@ namespace Parser
 		char* alocSizeToken = strtok(NULL, split);
 		uint16_t alocSize = atoi(alocSizeToken);
 
-		return EncodeInstruction(Opcodes::ALOC, -1, -1, -1, alocSize);
+		return EncodeInstruction(Opcodes::ALOC, alocSize);
+	}
+
+	uint32_t Parser::HandleSet()
+	{
+		uint8_t targetRegister = ExtractRegister();
+		uint8_t valueRegister = ExtractRegister();
+		return EncodeInstruction(Opcodes::SET, targetRegister, valueRegister);
 	}
 }

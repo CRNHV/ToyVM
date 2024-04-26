@@ -1,10 +1,10 @@
 #include <memory>
 #include <windows.h>
 
-#include "../Includes/Vm.h"
-#include "../Includes/Opcodes.h"
-#include "../Includes/VmExecutor.h"
 #include "../Includes/BitManipulation.h"
+#include "../Includes/Opcodes.h"
+#include "../Includes/Vm.h"
+#include "../Includes/VmExecutor.h"
 #include "../Includes/VmMain.h"
 
 namespace VmMain
@@ -62,7 +62,7 @@ namespace VmMain
 			}
 
 			uint32_t nextInstruction = Vm::NextInstruction(VmInstance);
-			uint8_t opcode = BitManipulation::ReadFirst8(nextInstruction);
+			int8_t opcode = BitManipulation::ReadFirst8(nextInstruction);
 
 			switch (opcode)
 			{
@@ -120,11 +120,12 @@ namespace VmMain
 			case Opcodes::ALOC:
 				VmExecutor::ExecuteAloc(VmInstance, nextInstruction);
 				break;
+			case Opcodes::SET:
+				VmExecutor::ExecuteSet(VmInstance, nextInstruction);
+				break;
 			case Opcodes::FREE:
 				break;
 			}
-
-			Sleep(300);
 		}
 	}
 
